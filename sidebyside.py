@@ -1,7 +1,7 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import dcc, html, dash_table
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import pandas as pd
 
 # Initialize the Dash app
@@ -29,6 +29,8 @@ adj_p_columns = [
     'Adj. P-value: (no2-cla/lps) / (ctrl)'
 ]
 
+additional_columns = ['Calc. MW', 'm/z']
+
 # Load data from CSV and preprocess it
 def load_and_preprocess_data(filepath):
     data = pd.read_csv(filepath, encoding='ISO-8859-1', on_bad_lines='skip')
@@ -51,6 +53,10 @@ def load_and_preprocess_data(filepath):
     # Ensure numeric conversion for ratio, p_value, and adj_p_value columns
     for col in ratio_columns + p_columns + adj_p_columns:
         data[col] = pd.to_numeric(data[col], errors='coerce')
+
+    # Round the additional columns to one decimal place
+    for col in additional_columns:
+        data[col] = data[col].round(1)
 
     # Filter the data based on ratio conditions
     filtered_data = data[
@@ -83,7 +89,7 @@ def load_and_preprocess_data(filepath):
 
     return filtered_data
 
-data = load_and_preprocess_data('NicoleAll.csv')
+data = load_and_preprocess_data('AdjustedWorkflow.csv')
 
 # Define the color logic to be used in style_data_conditional
 def generate_style_conditions(filtered_data):
@@ -94,26 +100,32 @@ def generate_style_conditions(filtered_data):
             p_value = pd.to_numeric(compound[p_col], errors='coerce')
             if pd.notna(adj_p_value) and adj_p_value <= 0.05:
                 color = 'green'
+                text_color = 'white'
             elif pd.notna(p_value) and p_value <= 0.05:
                 color = 'yellow'
+                text_color = 'black'
             else:
                 color = 'red'
+                text_color = 'red'
             conditions.append({
                 'if': {
                     'filter_query': f'{{Identifier}} = "{compound["Identifier"]}" && {{{p_col}_display}} = "{compound[f"{p_col}_display"]}"',
                     'column_id': f'{p_col}_display'
                 },
                 'backgroundColor': color,
-                'color': 'black' if color != 'red' else 'red'
+                'color': text_color
             })
-            if color == 'red':
-                conditions[-1]['color'] = 'red'
-                conditions[-1]['font'] = '0px'  # Hide text in red cells
     return conditions
 
 # Layout of the app
 app.layout = dbc.Container(
     [
+        dbc.Row(
+            dbc.Col(
+                html.Button("Show/Hide", id="toggle-columns", className="btn btn-primary mb-4", style={"margin": "20px"}),
+                width=12
+            )
+        ),
         dbc.Row(dbc.Col(html.H1("Significant Compound Comparison", className="text-center text-primary mb-4", style={"font-weight": "bold"}), width=12)),
         dbc.Row(dbc.Col(dcc.Loading(id="loading", children=[html.Div(id="compounds-table")], type="default"), width=12))
     ],
@@ -124,14 +136,25 @@ app.layout = dbc.Container(
 # Callback to update the table
 @app.callback(
     Output("compounds-table", "children"),
-    Input('loading', 'children')  # Trigger when the app loads
+    [Input('loading', 'children'), Input('toggle-columns', 'n_clicks')],
+    [State('loading', 'children')]
 )
-def update_table(_):
+def update_table(_, n_clicks, __):
     filtered_data = load_and_preprocess_data('NicoleAll.csv')
     display_columns = [f"{col}_display" for col in p_columns]
+    
+    show_additional_columns = (n_clicks is not None) and (n_clicks % 2 == 1)
+    
+    columns = [{"name": "Identifier", "id": "Identifier"}]
+    
+    if show_additional_columns:
+        columns += [{"name": col, "id": col} for col in additional_columns]
+    
+    columns += [{"name": col, "id": f"{col}_display"} for col in p_columns]
+    
     return dash_table.DataTable(
-        columns=[{"name": "Identifier", "id": "Identifier"}] + [{"name": col, "id": f"{col}_display"} for col in p_columns],
-        data=filtered_data[['Identifier'] + display_columns].to_dict('records'),
+        columns=columns,
+        data=filtered_data[['Identifier'] + (additional_columns if show_additional_columns else []) + display_columns].to_dict('records'),
         style_table={'overflowX': 'auto', 'minWidth': '100%'},
         style_cell={'textAlign': 'center', 'minWidth': '150px', 'maxWidth': '200px', 'whiteSpace': 'normal'},
         style_header={'backgroundColor': 'rgb(230, 230, 230)', 'fontWeight': 'bold'},
