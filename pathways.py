@@ -76,11 +76,24 @@ def format_to_scientific(value):
             return value
     return value
 
+# Function to check if a row has all red p-value cells
+def has_all_red_cells(row):
+    for adj_p_col in adj_p_columns:
+        adj_p_value = pd.to_numeric(row[adj_p_col], errors='coerce')
+        if pd.notna(adj_p_value) and adj_p_value < 0.05:
+            return False
+    return True
+
 # Generate the tables for each pathway
-def generate_tables_for_pathways(data, pathways):
+def generate_tables_for_pathways(data, pathways, hide_red):
     tables = []
     for pathway in pathways:
         pathway_data = data[data['BioCyc Pathways'] == pathway]
+
+        if hide_red:
+            pathway_data = pathway_data[~pathway_data.apply(has_all_red_cells, axis=1)]
+
+        pathway_data = pathway_data.sort_values(by='Calc. MW')
 
         # Generate the table columns
         columns = [
@@ -124,7 +137,7 @@ def generate_tables_for_pathways(data, pathways):
             columns=columns,
             data=formatted_data.to_dict('records'),
             style_table={'overflowX': 'auto', 'minWidth': '100%'},
-            style_cell={'textAlign': 'center', 'minWidth': '150px', 'maxWidth': '200px', 'whiteSpace': 'normal'},
+            style_cell={'textAlign': 'center', 'minWidth': '100px', 'maxWidth': '150px', 'whiteSpace': 'normal'},
             style_header={'backgroundColor': 'rgb(230, 230, 230)', 'fontWeight': 'bold'},
             style_data_conditional=style_conditions,
             page_size=len(pathway_data)  # Display all rows on one page
@@ -138,12 +151,29 @@ def generate_tables_for_pathways(data, pathways):
 # Layout of the app
 app.layout = dbc.Container(
     [
+        dbc.Row(
+            dbc.Col(
+                html.Button("Exclude insignificant rows", id="toggle-red-rows", className="btn btn-primary mb-4", style={"margin": "20px"}),
+                width=12
+            )
+        ),
         dbc.Row(dbc.Col(html.H1("Significant Compound Pathway Tables", className="text-center text-primary mb-4", style={"font-weight": "bold"}), width=12)),
-        html.Div(id='tables-container', children=generate_tables_for_pathways(data, unique_pathways))
+        html.Div(id='tables-container')
     ],
     fluid=True,
     style={"backgroundColor": "#f8f9fa", "padding": "20px"}
 )
+
+# Callback to update the table and button text
+@app.callback(
+    [Output("tables-container", "children"),
+     Output("toggle-red-rows", "children")],
+    [Input('toggle-red-rows', 'n_clicks')]
+)
+def update_tables(n_clicks):
+    hide_red = (n_clicks is not None) and (n_clicks % 2 == 1)
+    button_text = "Include insignificant rows" if hide_red else "Exclude insignificant rows"
+    return generate_tables_for_pathways(data, unique_pathways, hide_red), button_text
 
 if __name__ == '__main__':
     app.run_server(debug=True)
