@@ -77,9 +77,9 @@ def load_and_preprocess_data(filepath):
     # Sort the data alphabetically by Identifier, with those using Calc. MW at the bottom
     filtered_data = filtered_data.sort_values(by=['Used Calc MW', 'Identifier'])
 
-    # Add a new display column combining p-value and adj p-value
+    # Add a new display column combining p-value and adj p-value with spaces around '/'
     for p_col, adj_p_col in zip(p_columns, adj_p_columns):
-        filtered_data[f'{p_col}_display'] = filtered_data.apply(lambda row: f"{row[p_col]:.1e}/{row[adj_p_col]:.1e}", axis=1)
+        filtered_data[f'{p_col}_display'] = filtered_data.apply(lambda row: f"{row[p_col]:.1e} / {row[adj_p_col]:.1e}", axis=1)
 
     return filtered_data
 
@@ -104,8 +104,11 @@ def generate_style_conditions(filtered_data):
                     'column_id': f'{p_col}_display'
                 },
                 'backgroundColor': color,
-                'color': 'white' if color != 'yellow' else 'black'
+                'color': 'black' if color != 'red' else 'red'
             })
+            if color == 'red':
+                conditions[-1]['color'] = 'red'
+                conditions[-1]['font'] = '0px'  # Hide text in red cells
     return conditions
 
 # Layout of the app
@@ -132,7 +135,8 @@ def update_table(_):
         style_table={'overflowX': 'auto', 'minWidth': '100%'},
         style_cell={'textAlign': 'center', 'minWidth': '150px', 'maxWidth': '200px', 'whiteSpace': 'normal'},
         style_header={'backgroundColor': 'rgb(230, 230, 230)', 'fontWeight': 'bold'},
-        style_data_conditional=generate_style_conditions(filtered_data)
+        style_data_conditional=generate_style_conditions(filtered_data),
+        page_size=len(filtered_data)  # Display all rows on one page
     )
 
 if __name__ == '__main__':
