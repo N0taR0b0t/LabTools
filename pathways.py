@@ -61,7 +61,7 @@ def load_and_preprocess_data(filepath):
 
     return data
 
-data = load_and_preprocess_data('AdjustedWorkflow.csv')
+data = load_and_preprocess_data('BioCycWorkflow.csv')
 
 # Identify unique pathways
 unique_pathways = data['BioCyc Pathways'].unique()
