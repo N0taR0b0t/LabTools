@@ -140,7 +140,7 @@ app.layout = dbc.Container(
     [State('loading', 'children')]
 )
 def update_table(_, n_clicks, __):
-    filtered_data = load_and_preprocess_data('NicoleAll.csv')
+    filtered_data = load_and_preprocess_data('AdjustedWorkflow.csv')
     display_columns = [f"{col}_display" for col in p_columns]
     
     show_additional_columns = (n_clicks is not None) and (n_clicks % 2 == 1)
