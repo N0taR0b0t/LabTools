@@ -57,7 +57,7 @@ def load_and_preprocess_data(filepath):
         'BioCyc Pathways': data['BioCyc Pathways'].str.split(';')
     }).explode('BioCyc Pathways')
     data['BioCyc Pathways'] = data['BioCyc Pathways'].str.strip()
-    data['BioCyc Pathways'] = data['BioCyc Pathways'].str.replace('special_pathway', '&gamma;-linolenate biosynthesis II (animals)')
+    data['BioCyc Pathways'] = data['BioCyc Pathways'].str.replace('special_pathway', 'γ-linolenate biosynthesis II (animals)')
 
     return data
 
