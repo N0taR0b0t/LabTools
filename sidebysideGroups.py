@@ -5,7 +5,7 @@ import pandas as pd
 app = Flask(__name__)
 
 # Step 1: Identify and filter .txt files by their modification date
-directory = '/Users/matias/Library/Mobile Documents/com~apple~CloudDocs/Work'
+directory = '/Users/matias/Documents/GitHub/LabTools'
 files = [f for f in os.listdir(directory) if f.endswith('.txt') and '(' in f and ')' in f]
 files.sort(key=lambda x: os.path.getmtime(os.path.join(directory, x)), reverse=True)
 selected_files = files[:4]

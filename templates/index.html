@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Compounds</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        .red {
+            background-color: red;
+            color: white;
+        }
+        .green {
+            background-color: green;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chemical Compounds</h1>
+        <div class="form-group">
+            <label for="compound-group">Select Compound Group:</label>
+            <select id="compound-group" class="form-control">
+                {% for group in groups %}
+                    <option value="{{ group }}">{{ group }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <table id="compounds-table" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Formula</th>
+                    {% for file in files %}
+                        <th>{{ file }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function() {
+            function loadTable(group) {
+                $.getJSON('/data/' + group, function(data) {
+                    var tableBody = $('#compounds-table tbody');
+                    tableBody.empty();
+                    data.formulas.forEach(function(formula, index) {
+                        var row = '<tr><td>' + formula + '</td>';
+                        var isAllRed = true;
+                        data.table_data[index].forEach(function(found) {
+                            var colorClass = found === 1 ? 'green' : 'red';
+                            if (found === 1) {
+                                isAllRed = false;
+                            }
+                            row += '<td class="' + colorClass + '"></td>';
+                        });
+                        row += '</tr>';
+                        if (!isAllRed) {
+                            tableBody.append(row);
+                        }
+                    });
+                });
+            }
+
+            $('#compound-group').change(function() {
+                var selectedGroup = $(this).val();
+                loadTable(selectedGroup);
+            });
+
+            loadTable($('#compound-group').val());
+        });
+    </script>
+</body>
+</html>
