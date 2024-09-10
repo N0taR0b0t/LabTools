@@ -4,7 +4,6 @@ from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output, State
 import pandas as pd
 
-# Initialize the Dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # Define necessary columns
