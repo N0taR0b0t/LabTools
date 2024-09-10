@@ -8,7 +8,6 @@ files = [
     "lps_ctrl.csv", "cla_ctrl.csv", "no2-cla-lps_lps.csv"
 ]
 
-# Boolean flag to control outlier removal
 REMOVE_OUTLIER = False
 
 # Initialize a dictionary to store the cumulative distances for each compound
