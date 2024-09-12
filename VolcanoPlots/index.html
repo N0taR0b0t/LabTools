@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Section</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #34495e;
+            color: #ecf0f1;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 3em;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            color: #f39c12;
+        }
+        p {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .divider {
+            border-bottom: 2px solid #7f8c8d;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .content-wrapper {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            width: 100%;
+        }
+        .section {
+            width: 45%;
+            padding: 20px;
+            text-align: left;
+            background-color: #1abc9c;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 500px;
+        }
+        .section h2 {
+            text-align: center;
+            color: #34495e;
+            font-size: 1.8em;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            flex-grow: 1;
+        }
+        .color-blue {
+            color: blue;
+        }
+        .color-green {
+            color: green;
+        }
+        .color-red {
+            color: red;
+        }
+        .color-yellow {
+            color: yellow;
+        }
+        button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .vertical-divider {
+            width: 2px;
+            height: 100%;
+            background-color: #7f8c8d;
+            margin: 0 20px;
+        }
+        footer {
+            width: 100%;
+            text-align: center;
+            margin-top: 40px;
+            color: #ecf0f1;
+            font-size: 1.1em;
+        }
+        .misc-section {
+            background-color: #2c3e50;
+            color: #f39c12;
+            border-radius: 15px;
+            padding: 5px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .misc-divider {
+            border-bottom: 2px solid #7f8c8d;
+            width: 100%;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Help Section</h1>
+        <p>This is the help section. Click the buttons below to view each visual and learn more about it.</p>
+
+        <div class="divider"></div>
+
+        <div class="content-wrapper">
+            <!-- Volcano Plot Section -->
+            <div class="section">
+                <h2>Volcano Plot</h2>
+                <ul>
+                    <li>Zoom, selection tools, and axis reset are available in the top-right corner.</li>
+                    <br>
+                    <li><span class="color-green">Green</span> points indicate significant up-regulation.</li>
+                    <br>
+                    <li><span class="color-yellow">Yellow</span> points (there are 50) highlight areas of interest, typically located in the top corners.</li>
+                    <br>
+                    <li><span class="color-red">Red</span> points indicate significant down-regulation (±0.5 log2 fold change, p-value < 0.05).</li>
+                    <br>
+                    <li><span class="color-blue">Blue</span> points represent all other data points.</li>
+                </ul>
+                <button onclick="openVolcanoPlot()">View Volcano Plot</button>
+            </div>
+
+            <div class="vertical-divider"></div>
+
+            <!-- Colored Cells Section -->
+            <div class="section">
+                <h2>Colored Cells</h2>
+                <ul>
+                    <li>Each cell shows p-value / adj. p-value.</li><br>
+                    <li><span class="color-green">Green</span> cells: both p-values under 0.05.</li><br>
+                    <li><span class="color-yellow">Yellow</span> cells: p-value under 0.05, but adj. p-value above 0.05.</li><br>
+                    <li><span class="color-red">Red</span> cells: both p-values above 0.05.</li><br>
+                    <li>If no compound identifier exists, Calc. MW will be shown.</li><br>
+                    <li>Use "Show/Hide Additional Columns" to toggle the "Calc. MW" and "m/z" columns.</li>
+                </ul>
+                <button onclick="openColorCells()">View Colored Cells</button>
+            </div>
+        </div>
+        <div class="misc-section">
+            <p>Note: Removing or renaming files may break something. Instead, make a copy and modify that version.</p>
+        </div>
+
+    </div>
+
+    <script>
+        function openVolcanoPlot() {
+            window.open('volcano_plot.html', '_blank');
+        }
+
+        function openColorCells() {
+            window.open('color_cells.html', '_blank');
+        }
+    </script>
+</body>
+</html>
