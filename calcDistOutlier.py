@@ -15,6 +15,7 @@ compound_distances = defaultdict(list)
 outlier_detected_files = defaultdict(list)
 
 # List of relevant columns to process
+# TODO: Replace hard coded columns
 comparisons = [
     ("Log2 Fold Change: (cla) / (ctrl)", "P-value: (cla) / (ctrl)"),
     ("Log2 Fold Change: (cla/lps) / (ctrl)", "P-value: (cla/lps) / (ctrl)"),
